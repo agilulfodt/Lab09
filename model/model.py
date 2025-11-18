@@ -77,4 +77,26 @@ class Model:
         """ Algoritmo di ricorsione che deve trovare il pacchetto che massimizza il valore culturale"""
 
         # TODO: è possibile cambiare i parametri formali della funzione se ritenuto opportuno
+        if valore_corrente > self._valore_ottimo:
+            self._valore_ottimo = valore_corrente
+            self._pacchetto_ottimo = pacchetto_parziale.copy()
+            self._costo = costo_corrente
+        for index in range(start_index, len(tour_regione)):
+            tour = tour_regione[index]
+            if tour.attrazioni.isdisjoint(attrazioni_usate) == False:
+                continue
+            nuova_durata = durata_corrente + tour.durata_giorni
+            nuovo_costo = costo_corrente + tour.costo
+            nuovo_valore = valore_corrente + sum(attrazione.valore_culturale for attrazione in tour.attrazioni)
+            if nuovo_costo > max_budget:
+                continue
+            if nuova_durata > max_giorni:
+                continue
 
+            pacchetto_parziale.append(tour)
+            attrazioni_usate.update(tour.attrazioni)
+
+            self._ricorsione(index + 1, pacchetto_parziale, nuova_durata, nuovo_costo, nuovo_valore, attrazioni_usate, tour_regione, max_giorni, max_budget)
+
+            pacchetto_parziale.pop()
+            attrazioni_usate.difference_update(tour.attrazioni)
